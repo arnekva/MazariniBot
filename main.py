@@ -1,7 +1,9 @@
 import discord
 import os
 import random
+import urllib.request, json 
 from textVars import ekleGreier, welcomeMessages
+from  allCommands import allCommandsList
 
 client = discord.Client()
 
@@ -17,11 +19,13 @@ async def on_ready():
 @client.event
 async def on_reaction_add(reaction, user):
   #   channel = client.get_channel(342009170318327831)
+  await client.change_presence(activity=discord.Game(name="Listening for !mz"))
      #if reaction.message.channel.id != channel
      #return
-     if reaction.emoji == "🏃":
-       Role = discord.utils.get(user.server.roles, name="In the Gulag")
-       await client.add_roles(user, Role)
+  if reaction.emoji == "🏃":
+        # server = await client.get_server(340626855990132747)
+        # role = discord.utils.get(server.roles, id=691820232658124821)
+    await user.add_roles(discord.utils.get(user.guild.roles, id=691820232658124821))
 
 @client.event
 async def on_message(message):
@@ -29,7 +33,10 @@ async def on_message(message):
         return
 
     if message.content.startswith('!mz help'):
-        await message.channel.send('Følgende kommandoer finnes:\n!mz thomas\n!mz eivind\n!mz owo <melding>\nHvis du har tips om flere kommandoer, send gjerne en melding')
+      commands = ""
+      for i in range (len(allCommandsList)):
+        commands += "\n" + allCommandsList[i]
+      await message.channel.send('Følgende kommandoer finnes:' + commands)
     
     if message.content.startswith('!mz thomas'):
         await message.channel.send('Har fese!')
@@ -45,11 +52,19 @@ async def on_message(message):
         string += " " + random.choice(ekleGreier)
         await message.channel.send(string[8:]) 
 
+    if message.content.startswith('!mz vær'):
+        url = "http://api.openweathermap.org/data/2.5/weather?q="
+        appId= "&appid=9de243494c0b295cca9337e1e96b00e2"
+        location = message.content[8:]
+        with urllib.request.urlopen(url+location+appId+"&units=metric") as url:
+          data = json.loads(url.read().decode())
+        await message.channel.send(data['name'] + ", " + data['sys']['country'] + "\n" + "Temperatur: " + str(data['main']['temp']) + "\nFøles som: " + str(data['main']['feels_like']) + "\nVær: " + data['weather'][0]['main'])
+
 @client.event
 async def on_member_join(member):
+    await discord.defaultChannel.send(random.choice(welcomeMessages) + member.mention)
     role = discord.utils.get(member.server.roles, id=691820232658124821)
     await client.add_roles(member, role)
-    await discord.defaultChannel.send(random.choice(welcomeMessages) + member.mention)
 
 
 client.run(os.getenv('TOKEN'))
