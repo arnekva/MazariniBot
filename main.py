@@ -13,6 +13,7 @@ import threading
 import time
 from discord.ext import commands, tasks
 from discord.utils import get
+import requests
 
 
 intents = discord.Intents.default()
@@ -20,6 +21,7 @@ intents.members = True
 client = discord.Client(intents=intents)
 
 _currentDay = datetime.now().date().strftime("%m-%d")
+_base_shutterstock_url = "https://api.shutterstock.com/"
 
 @client.event
 async def on_ready():
@@ -59,7 +61,7 @@ async def on_message(message):
         await message.channel.send('Har fese!')
 
     polse = ["pølse", "Pølse", "pause", "Pause"]
-    if any(x in message.content for x in polse):
+    if any(x in message.content for x in polse): #TODO: Timeout på hvor ofte den kan reagere
         await message.channel.send('Hæ, pølse?')
     
     if message.content.startswith('!mz eivindpride'):
@@ -116,8 +118,18 @@ async def on_message(message):
         await message.channel.send(st)
         if(randMin == 5 & randSek == 59):
             await message.channel.send("Dette er det lengste som koden tillater noen å spinne. Gratulerer!")
-    
+        if(randMin == 0 & randSek == 1):
+            await message.channel.send("Du suge faktisk.")  
         
+    if message.content.startswith('!mz bilde'):
+      await find_picture(message)
+    
+    if message.content.startswith('!mz video'):
+      await find_video(message)
+
+    if message.content.startswith('!mz lyd'):
+      await find_audio(message)
+
 @client.event
 async def on_member_join(member):
     print('Recognised that a member joined')
@@ -166,6 +178,63 @@ async def checkTime():
 #     await asyncio.sleep(1)
 #     # threading.Timer(5, checkTime).start() #43200
     
+def shutterstock_api_header():
+  api_token = "v2/dW0yMzhwZGdleDQ2SWxSamU3aGF4UHBuRzl0QzZBYmYvMjkzODM4MTg3L2N1c3RvbWVyLzMvM2htTEdSOVctZG5pdjZTUEFFRGR6QmZwcEYyM1NYc2xOdFRocjNFcV9pZk5PVGoxd2hEeS01UDZVUFdJSGlQMHgtV0g0VkEwM1NSajZkSEhaRDNkMkNHTEVSY1RGSmQ0bWJaMWdPeDI0SW1Mbzg2WENpTjJFbVcxMG1Zb2Y0MzV1Nm9LaDlackJZT25mLVh5cl8xSThXbFF5dWY4YVU0YVNpVXZkRS1CMDdGTlVFXzhNb2R0RXNnRndxMVpQeWtsdG5HSmotbjVFOVFfME1tQ1prT1QtQQ"
 
+  return {'Authorization': "Bearer " + api_token}
+
+async def find_picture(message):
+  headers = shutterstock_api_header()
+  
+  search_term = message.content.replace("!mz bilde", "")
+  
+  response = requests.get(
+    _base_shutterstock_url + "v2/images/search?query=" + search_term + "&sort=popular", headers=headers)
+  
+  if(len(response.json()["data"]) > 0):
+      image = response.json()["data"][0]
+      image_description = image["description"]
+      image_url = image["assets"]["preview_1500"]["url"]
+      
+      await message.channel.send(image_description + "\n" + image_url) 
+  else:
+      await message.channel.send("Fant ingen bilder.") 
+
+async def find_video(message):
+  
+  headers = shutterstock_api_header()
+
+  search_term = message.content.replace("!mz video", "")
+  response = requests.get(
+    _base_shutterstock_url + "v2/videos/search?query=" + search_term + "&sort=popular", headers=headers)
+  
+  if(len(response.json()["data"]) > 0):
+      video = response.json()["data"][0]
+      video_description = video["description"]
+      video_url = video["assets"]["thumb_mp4"]["url"]
+      await message.channel.send(video_description + "\n" + video_url) 
+  else:
+      await message.channel.send("Fant ingen video.") 
+
+
+async def find_audio(message):
+  headers = shutterstock_api_header()
+  
+  search_term = message.content.replace("!mz lyd", "")
+  
+  response = requests.get(
+    _base_shutterstock_url + "v2/audio/search?query=" + search_term, headers=headers)
+  
+  print(response.json())
+  if(len(response.json()["data"]) > 0):
+      
+      audio_url = response.json()["data"][0]["assets"]["preview_mp3"]["url"]
+      # imageURL = "https://cdn.discordapp.com/attachments/744631318578462740/755866713182044240/ezgif-4-6eba1fde99f2.png"
+      embed = discord.Embed()
+      embed.set_image(url=audio_url)
+      await message.channel.send(embed=embed)
+      # await message.channel.send(file=discord.File(audio_url)) 
+  else:
+      await message.channel.send("Fant ingen lyd.") 
 
 client.run(os.getenv('TOKEN'))
