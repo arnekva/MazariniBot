@@ -1,0 +1,17 @@
+Denne listen inkluderer todo's.
+
+
+1. Legg til "Reager på denne melding for å få tildelt rolle" når noen signer opp.
+* Nå sendes en melding med "Velkommen til blabla". 
+* Legg til en melding som sier f.eks "Reager med :emoji1: for sosialt, reager med :emoji2: for WZ, :emoji3: for X osv."
+* Se on_reaction_add for allerede fungerende kode
+
+
+2. Refactor kode
+* Finne en god måte å sette opp onMessage på.
+* Muligens flytte flere funksjoner i separate filer?
+* Clean up på imports
+
+
+3. 
+
