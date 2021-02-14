@@ -5,8 +5,6 @@ allCommandsList = [
  "!mz bursdag <dd-mm-yyyy>",
  "!mz spin",
  "!mz Hei <navn>",
- "meme",
- "Kan Eivind",
  "!mz Øyvind",
  "!mz Joiij",
  "pølse",
