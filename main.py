@@ -2,9 +2,10 @@ import discord
 import os
 import random
 from textVars import welcomeMessages, polse
+from meme_commands import bonkMemeUrl
 
 # Egne kommandoer
-from on_message import owoify_message, register_birthday, find_weather, mordi, find_stock, help_command
+from on_message import owoify_message, register_birthday, find_weather, mordi, find_stock, help_command, global_message
 from shutterstock_commands import check_for_shutterstock_commands
 from spin_command import spin
 from warzone_commands import check_for_warzone_commands
@@ -32,7 +33,7 @@ async def on_ready():
 
 @client.event
 async def on_reaction_add(reaction, user):
-  await react_to_reactions(reaction, user)
+  await react_to_reactions(reaction, user, client)
  
 
 @client.event
@@ -48,7 +49,7 @@ async def on_message(message):
     await react_to_author(message)
 
     if message_content.startswith('!mz help'):
-      help_command(message)
+      await help_command(message)
     
     if message_content.startswith('!mz thomas'):
       await message.channel.send('Har fese!')
@@ -90,6 +91,13 @@ async def on_message(message):
     if message_content.startswith(('!mz joiij', '!mz Joiij')):
       await message.channel.send("weeeee!")
 
+    if(message.channel.id == 811557208872714250 and message_content.startswith("!mz send")):
+      await global_message(message, client)
+    
+    if(message_content.startswith("!mz bonk")):
+      await message.channel.send(random.choice(bonkMemeUrl))
+
+
 @client.event
 async def on_member_join(member):
     print('Recognised that a member joined')
@@ -97,7 +105,8 @@ async def on_member_join(member):
     await channel.send(random.choice(welcomeMessages) + member.mention)
     # role = discord.utils.get(member.server.roles, id=691820232658124821)
     # await client.add_roles(member, role)
-    # await channel.send("Hvis du er her for Warzone, reager med <:ez:803279867801239552> for å få automatisk tildelt rolle.")
+    msg = await channel.send("Hvis du er her for Warzone, reager med 👍 for å få automatisk tildelt rolle.")
+    await msg.add_reaction("👍")
 
 
 client.run(os.getenv('TOKEN'))

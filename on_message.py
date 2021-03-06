@@ -65,3 +65,9 @@ async def find_stock(message):
   stk = yf.Ticker(stock)
   print(stk.history(period="1m"))
   await message.channel.send(stk.history(period="1m"))
+
+async def global_message(message, client):
+  msg = message.content.replace("!mz send ", "")
+  channel = client.get_channel(340626855990132747)
+  message2 = await channel.send(msg)
+  

@@ -11,4 +11,5 @@ allCommandsList = [
  "!mz rebirth",
  "!mz verdansk",
  "!mz mordi"
+ "!mz bilde <string>"
 ]
