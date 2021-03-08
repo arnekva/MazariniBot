@@ -7,7 +7,7 @@ from meme_commands import bonkMemeUrl
 # Egne kommandoer
 from on_message import owoify_message, register_birthday, find_weather, mordi, find_stock, help_command, global_message
 from shutterstock_commands import check_for_shutterstock_commands
-from spin_command import spin
+from spin_command import spin, readHighscores
 from warzone_commands import check_for_warzone_commands
 from react_to_reactions import react_to_reactions
 from check_for_birthday import checkTime
@@ -91,11 +91,13 @@ async def on_message(message):
     if message_content.startswith(('!mz joiij', '!mz Joiij')):
       await message.channel.send("weeeee!")
 
-    if(message.channel.id == 811557208872714250 and message_content.startswith("!mz send")):
+    if(message.channel.id == 811557208872714250 and message_content.startswith("!mz send") and (message.author.id == 245607554254766081 or message.author.id == 239154365443604480)):
       await global_message(message, client)
     
     if(message_content.startswith("!mz bonk")):
       await message.channel.send(random.choice(bonkMemeUrl))
+    if(message_content.startswith("!mz highscore")):
+      await readHighscores(message)
 
 
 @client.event

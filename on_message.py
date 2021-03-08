@@ -69,5 +69,5 @@ async def find_stock(message):
 async def global_message(message, client):
   msg = message.content.replace("!mz send ", "")
   channel = client.get_channel(340626855990132747)
-  message2 = await channel.send(msg)
+  await channel.send(msg)
   
