@@ -1,3 +1,3 @@
 # Discord Bot
 
-Under utvikling
+Not in use. See https://github.com/arnekva/Mazarini-Bot/ instead.
